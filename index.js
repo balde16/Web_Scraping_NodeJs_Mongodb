@@ -25,11 +25,15 @@ connect = async page => {
   )
 
   await page.click('#signin > div > main > form > button')
+  return 1
 }
 
 accessSearchPage = async page => {
   //TODO
   city = 'Paris'
+  await page.waitForSelector(
+    '#newsFeed > div.news-feed__usages.ptm.pbm.cf > ul > li:nth-child(2) > article > div > div.bx.usage__box.bd > div.h-basic.pll.prl > p > a'
+  )
   await page.goto(
     `http://fr.viadeo.com/fr/trombinoscope/choixecole/?town=${city}&countrySchool=fr`
   )
