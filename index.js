@@ -1,6 +1,5 @@
 const puppeteer = require('puppeteer')
 const config = require('./conf.json')
-
 ;(async () => {
   const browser = await puppeteer.launch({ headless: false})
   const page = await browser.newPage()
@@ -9,9 +8,9 @@ const config = require('./conf.json')
   // await accessUserProfil(page)
   // const profil = await retrieveProfil()
   // console.log(profil)
+  await secondPage(page)
   await browser.close()
 })()
-
 // connect directly to viadeo (need a page from puppeter)
 connect = async page => {
   page.on('load', () => console.log("Loaded: " + page.url()));
@@ -27,7 +26,6 @@ connect = async page => {
   await page.click('button')
   await page.waitForNavigation();
 }
-
 accessSearchPage = async page => {
   //TODO
   name = 'Arnaud'
@@ -40,25 +38,33 @@ accessSearchPage = async page => {
     '#ember674 > div > div.gu.gu-last.gu-m-1of1.unified-search__profiles > div.bx.pbxs'
   )
   hrefs = await page.$$eval('h2 > a', as => as.map(a => a.href));
-
   for (let href of hrefs) {
     // open the page
     try {
-      if (!linkArray.includes(href)) {
-        linkArray.push(href)
-      }
-        await page.goto(href);
-        console.log(linkArray);
+      console.log('first -----', href)
+      // const profil = new ProfilScrapper(href, page)
+      // profil.getProfile()
     } catch (error) {
         console.log(error);
         console.log('failed to open the page: ', href);
     }
   }
+  secondPage = async page => {
+    await page.setDefaultNavigationTimeout(10000); 
+    await page.goto(
+      `https://www.viadeo.com/fr/search/#/?page=2&q=${name}`
+    )
+    secondHrefs = await page.$$eval('h2 > a', as => as.map(a => a.href));
+    for (let href of secondHrefs) {
+      // open the page
+      try {
+        console.log('second ----', href)
+        // const profil = new ProfilScrapper(href, page)
+        // profil.getProfile()
+      } catch (error) {
+          console.log(error);
+          console.log('failed to open the page: ', href);
+      }
+    }
+  }
 }
-
-// accessUserProfil = async page => {
-//   await page.goto(
-//     `https://www.viadeo.com/fr/search/#/?q=${name}`
-//   )
-// }
-
