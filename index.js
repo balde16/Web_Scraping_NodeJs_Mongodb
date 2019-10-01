@@ -2,18 +2,19 @@ const puppeteer = require('puppeteer')
 const config = require('./conf.json')
 
 ;(async () => {
-  const browser = await puppeteer.launch({ headless: false })
+  const browser = await puppeteer.launch({ headless: false})
   const page = await browser.newPage()
   await connect(page)
   await accessSearchPage(page)
-  accessSchool()
-  const profil = await retrieveProfil()
-  console.log(profil)
+  // await accessUserProfil(page)
+  // const profil = await retrieveProfil()
+  // console.log(profil)
   await browser.close()
 })()
 
 // connect directly to viadeo (need a page from puppeter)
 connect = async page => {
+  page.on('load', () => console.log("Loaded: " + page.url()));
   await page.goto('https://fr.viadeo.com/fr/signin')
   await page.type(
     '#signin > div > main > form > div:nth-child(2) > input[type=text]',
@@ -23,48 +24,41 @@ connect = async page => {
     '#signin > div > main > form > div:nth-child(3) > input[type=password]',
     config.pass
   )
-
-  await page.click('#signin > div > main > form > button')
-  return 1
+  await page.click('button')
+  await page.waitForNavigation();
 }
 
 accessSearchPage = async page => {
   //TODO
-  city = 'Paris'
-  await page.waitForSelector(
-    '#newsFeed > div.news-feed__usages.ptm.pbm.cf > ul > li:nth-child(2) > article > div > div.bx.usage__box.bd > div.h-basic.pll.prl > p > a'
-  )
+  name = 'Arnaud'
+  linkArray = [];
+  
   await page.goto(
-    `http://fr.viadeo.com/fr/trombinoscope/choixecole/?town=${city}&countrySchool=fr`
+    `https://www.viadeo.com/fr/search/#/?q=${name}`
   )
   await page.waitForSelector(
-    '#viadeocontent > div.gu.gu-3of4.pvxl > div.mbm > div:nth-child(1) > a'
+    '#ember674 > div > div.gu.gu-last.gu-m-1of1.unified-search__profiles > div.bx.pbxs'
   )
-  await page.click(
-    '#viadeocontent > div.gu.gu-3of4.pvxl > div.mbm > div:nth-child(1) > a'
-  )
+  hrefs = await page.$$eval('h2 > a', as => as.map(a => a.href));
 
-  await page.waitForSelector(
-    '#viadeocontent > div.gu.gu-3of4.pvxl > div.mbm > div:nth-child(2) > div.tar > a:nth-child(1)'
-  )
-  await page.click(
-    '#viadeocontent > div.gu.gu-3of4.pvxl > div.mbm > div:nth-child(2) > div.tar > a:nth-child(1)'
-  )
-
-  await page.waitForSelector(
-    '#viadeocontent > div.mainlayout > div.main > table:nth-child(10) > tbody > tr:nth-child(1) > td:nth-child(2) > div > div:nth-child(1) > a'
-  )
-  await page.click(
-    '#viadeocontent > div.mainlayout > div.main > table:nth-child(10) > tbody > tr:nth-child(1) > td:nth-child(2) > div > div:nth-child(1) > a'
-  )
-
-  await page.screenshot({ path: 'test-screenshot.png' })
+  for (let href of hrefs) {
+    // open the page
+    try {
+      if (!linkArray.includes(href)) {
+        linkArray.push(href)
+      }
+        await page.goto(href);
+        console.log(linkArray);
+    } catch (error) {
+        console.log(error);
+        console.log('failed to open the page: ', href);
+    }
+  }
 }
 
-accessSchool = () => {
-  //TODO
-}
+// accessUserProfil = async page => {
+//   await page.goto(
+//     `https://www.viadeo.com/fr/search/#/?q=${name}`
+//   )
+// }
 
-retrieveProfil = async () => {
-  return 'coucou TODO'
-}
