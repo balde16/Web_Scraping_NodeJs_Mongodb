@@ -2,10 +2,10 @@ const puppeteer = require('puppeteer')
 const config = require('./conf.json')
 const ProfileScrapper = require('./profileScrapper')
 async function timeout(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise(resolve => setTimeout(resolve, ms))
 }
 ;(async () => {
-  const browser = await puppeteer.launch({ headless: false})
+  const browser = await puppeteer.launch({ headless: false })
   const page = await browser.newPage()
   await connect(page)
   await accessSearchPage(page)
@@ -17,7 +17,7 @@ async function timeout(ms) {
 })()
 // connect directly to viadeo (need a page from puppeter)
 connect = async page => {
-  page.on('load', () => console.log("Loaded: " + page.url()));
+  page.on('load', () => console.log('Loaded: ' + page.url()))
   await page.goto('https://fr.viadeo.com/fr/signin')
   await page.type(
     '#signin > div > main > form > div:nth-child(2) > input[type=text]',
@@ -28,16 +28,14 @@ connect = async page => {
     config.pass
   )
   await page.click('button')
-  await page.waitForNavigation();
+  await page.waitForNavigation()
 }
 accessSearchPage = async page => {
   //TODO
   name = 'Arnaud'
-  linkArray = [];
-  
-  await page.goto(
-    `https://www.viadeo.com/fr/search/#/?q=${name}`
-  )
+  linkArray = []
+
+  await page.goto(`https://www.viadeo.com/fr/search/#/?q=${name}`)
   await page.waitForSelector(
     '#ember674 > div > div.gu.gu-last.gu-m-1of1.unified-search__profiles > div.bx.pbxs'
   )
@@ -50,24 +48,24 @@ accessSearchPage = async page => {
       const profil = new ProfileScrapper(href, page)
       await profil.getProfile()
     } catch (error) {
-        console.log(error);
-        console.log('failed to open the page: ', href);
+      console.log(error)
+      console.log('failed to open the page: ', href)
     }
   }
   secondPage = async page => {
-    await page.goto(`https://www.viadeo.com/fr/search/#/?page=2&q=${name}`);
+    await page.goto(`https://www.viadeo.com/fr/search/#/?page=2&q=${name}`)
 
-    await timeout(5000);
+    await timeout(5000)
 
-    secondHrefs = await page.$$eval('h2 > a', as => as.map(a => a.href));
+    secondHrefs = await page.$$eval('h2 > a', as => as.map(a => a.href))
     for (let href of secondHrefs) {
       // open the page
       try {
         const profil = new ProfileScrapper(href, page)
         await profil.getProfile()
       } catch (error) {
-          console.log(error);
-          console.log('failed to open the page: ', href);
+        console.log(error)
+        console.log('failed to open the page: ', href)
       }
     }
   }

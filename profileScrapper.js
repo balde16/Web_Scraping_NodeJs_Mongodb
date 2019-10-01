@@ -130,7 +130,7 @@ module.exports = class ProfileScrapper {
     const resJson = {}
     await page.goto(url)
     await page.waitForSelector(
-      '#public-profile > div > div > div.bx.tac-m.ptn.header.mbs > div.gr.grsxs.fluid-container > div.gu.gu-1of5.gu-m-1of1.header-content > div > img'
+      '#public-profile > div > div > div.bx.tac-m.ptn.header.mbs > div.gr.grsxs.fluid-container > div.gu.gu-last.ptxl.ptn-m > div > h1'
     )
     // Nom: '',
     // Prenom: '',
