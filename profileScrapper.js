@@ -8,7 +8,7 @@ module.exports = class ProfileScrapper {
     const textContent = await page.evaluate(
       () =>
         document.querySelector(
-          '#public-profile > div > div > div.bx.tac-m.ptn.header.mbs > div.gr.grsxs.fluid-container > div.gu.gu-last.ptxl.ptn-m > div > h1'
+          '#ember653 > div.profile-main-container > section > div > div.profile-overview.gu.gu-m-1of1 > h1'
         ).textContent
     )
     var fullName = textContent.split(' '),
@@ -126,12 +126,14 @@ module.exports = class ProfileScrapper {
   }
 
   async getProfile() {
+    async function timeout(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
     const { page, url } = this
     const resJson = {}
     await page.goto(url)
-    await page.waitForSelector(
-      '#public-profile > div > div > div.bx.tac-m.ptn.header.mbs > div.gr.grsxs.fluid-container > div.gu.gu-last.ptxl.ptn-m > div > h1'
-    )
+    await timeout(5000);
+
     // Nom: '',
     // Prenom: '',
     const name = await this.getName(page)
