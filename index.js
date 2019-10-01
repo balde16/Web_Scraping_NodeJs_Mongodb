@@ -1,5 +1,8 @@
 const puppeteer = require('puppeteer')
 const config = require('./conf.json')
+async function timeout(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 ;(async () => {
   const browser = await puppeteer.launch({ headless: false})
   const page = await browser.newPage()
@@ -50,10 +53,10 @@ accessSearchPage = async page => {
     }
   }
   secondPage = async page => {
-    await page.setDefaultNavigationTimeout(10000); 
-    await page.goto(
-      `https://www.viadeo.com/fr/search/#/?page=2&q=${name}`
-    )
+    await page.goto(`https://www.viadeo.com/fr/search/#/?page=2&q=${name}`);
+
+    await timeout(5000);
+
     secondHrefs = await page.$$eval('h2 > a', as => as.map(a => a.href));
     for (let href of secondHrefs) {
       // open the page
