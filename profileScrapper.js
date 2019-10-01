@@ -1,4 +1,4 @@
-class ProfileScrapper {
+module.exports = class ProfileScrapper {
   constructor(url, page) {
     this.url = url
     this.page = page

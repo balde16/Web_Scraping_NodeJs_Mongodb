@@ -1,5 +1,6 @@
 const puppeteer = require('puppeteer')
 const config = require('./conf.json')
+const ProfileScrapper = require('./profileScrapper')
 async function timeout(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -40,13 +41,14 @@ accessSearchPage = async page => {
   await page.waitForSelector(
     '#ember674 > div > div.gu.gu-last.gu-m-1of1.unified-search__profiles > div.bx.pbxs'
   )
-  hrefs = await page.$$eval('h2 > a', as => as.map(a => a.href));
-  for (let href of hrefs) {
+  links = await page.$$eval('div.bx.pbxs > a', 
+  as => as.map(a => a.href));
+  for (let href of links) {
+    console.log(href)
     // open the page
     try {
-      console.log('first -----', href)
-      // const profil = new ProfilScrapper(href, page)
-      // profil.getProfile()
+      const profil = new ProfileScrapper(href, page)
+      await profil.getProfile()
     } catch (error) {
         console.log(error);
         console.log('failed to open the page: ', href);
@@ -61,9 +63,8 @@ accessSearchPage = async page => {
     for (let href of secondHrefs) {
       // open the page
       try {
-        console.log('second ----', href)
-        // const profil = new ProfilScrapper(href, page)
-        // profil.getProfile()
+        const profil = new ProfileScrapper(href, page)
+        await profil.getProfile()
       } catch (error) {
           console.log(error);
           console.log('failed to open the page: ', href);
