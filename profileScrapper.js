@@ -8,7 +8,7 @@ export default class ProfileScrapper {
     const textContent = await page.evaluate(
       () =>
         document.querySelector(
-          '#public-profile > div > div > div.bx.tac-m.ptn.header.mbs > div.gr.grsxs.fluid-container > div.gu.gu-last.ptxl.ptn-m > div > h1'
+          '.profile-main-container > section > div > div.profile-overview.gu.gu-m-1of1 > h1'
         ).textContent
     )
     var fullName = textContent.split(' '),
@@ -19,7 +19,7 @@ export default class ProfileScrapper {
 
   async getPhoto(page) {
     const photo = await page.$$eval(
-      '#public-profile > div > div > div.bx.tac-m.ptn.header.mbs > div.gr.grsxs.fluid-container > div.gu.gu-1of5.gu-m-1of1.header-content > div > img',
+      '.main-avatar-container > span > img',
       imgs => imgs.map(img => img.getAttribute('src'))
     )
 
@@ -30,7 +30,7 @@ export default class ProfileScrapper {
     const desc = await page.evaluate(
       () =>
         document.querySelector(
-          '#public-profile > div > div > div.bx.tac-m.ptn.header.mbs > div.gr.grsxs.fluid-container > div.gu.gu-last.ptxl.ptn-m > div > div'
+          '.profile-main-container > section > div > div.profile-overview.gu.gu-m-1of1 > p.profile-headline.gray.mbm.mbl-m'
         ).textContent
     )
     return { desc }
