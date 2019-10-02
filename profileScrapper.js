@@ -50,125 +50,162 @@ module.exports = class ProfileScrapper {
   }
 
   async getName(page) {
-    const textContent = await page.evaluate(
-      () =>
-        document.querySelector(
-          '#public-profile > div > div > div.bx.tac-m.ptn.header.mbs > div.gr.grsxs.fluid-container > div.gu.gu-last.ptxl.ptn-m > div > h1'
-        ).textContent
-    )
-    var fullName = textContent.split(' '),
-      firstName = fullName[0],
-      lastName = fullName[fullName.length - 1]
-    return { firstName, lastName }
+    try {
+      const textContent = await page.evaluate(
+        () =>
+          document.querySelector(
+            '#public-profile > div > div > div.bx.tac-m.ptn.header.mbs > div.gr.grsxs.fluid-container > div.gu.gu-last.ptxl.ptn-m > div > h1'
+          ).textContent
+      )
+      var fullName = textContent.split(' '),
+        firstName = fullName[0],
+        lastName = fullName[fullName.length - 1]
+      return { firstName, lastName }
+    } catch (e) {
+      return { photo: 'Null' }
+    }
   }
 
   async getPhoto(page) {
-    const photo = await page.$$eval(
-      '#public-profile > div > div > div.bx.tac-m.ptn.header.mbs > div.gr.grsxs.fluid-container > div.gu.gu-1of5.gu-m-1of1.header-content > div > img',
-      imgs => imgs.map(img => img.getAttribute('src'))
-    )
+    try {
+      const photo = await page.$$eval(
+        '#public-profile > div > div > div.bx.tac-m.ptn.header.mbs > div.gr.grsxs.fluid-container > div.gu.gu-1of5.gu-m-1of1.header-content > div > img',
+        imgs => imgs.map(img => img.getAttribute('src'))
+      )
 
-    return { photo: photo[0] }
+      return { photo: photo[0] }
+    } catch (e) {
+      return { photo: 'Null' }
+    }
   }
 
   async getDesc(page) {
-    const desc = await page.evaluate(
-      () =>
-        document.querySelector(
-          '#public-profile > div > div > div.bx.tac-m.ptn.header.mbs > div.gr.grsxs.fluid-container > div.gu.gu-last.ptxl.ptn-m > div > div'
-        ).textContent
-    )
-    return { desc }
+    try {
+      const desc = await page.evaluate(
+        () =>
+          document.querySelector(
+            '#public-profile > div > div > div.bx.tac-m.ptn.header.mbs > div.gr.grsxs.fluid-container > div.gu.gu-last.ptxl.ptn-m > div > div'
+          ).textContent
+      )
+      return { desc }
+    } catch (e) {
+      return { desc: 'Null' }
+    }
   }
 
   async getParcours(page) {
-    const sel =
-      '#public-profile > div > div > div.optional-components.fluid-container > div.gr.mbm > div.current-position-left.gu.gu-2of3.gu-s-1of1 > div.experiences.mbs > section > article > div.gu.gu-5of6.ptm.prs.pbl.experience__content'
-    const parcours = await page.evaluate(sel => {
-      let elements = Array.from(document.querySelectorAll(sel))
-      let links = elements.map(element => {
-        return {
-          description: element.querySelector(
-            'div > div.experience-title-location > h3'
-          ).textContent,
-          duration: element.querySelector(
-            'div > div.experience-title-location > span.experience-period'
-          ).textContent
-        }
-      })
-      return links
-    }, sel)
-    return { parcours }
+    try {
+      const sel =
+        '#public-profile > div > div > div.optional-components.fluid-container > div.gr.mbm > div.current-position-left.gu.gu-2of3.gu-s-1of1 > div.experiences.mbs > section > article > div.gu.gu-5of6.ptm.prs.pbl.experience__content'
+      const parcours = await page.evaluate(sel => {
+        let elements = Array.from(document.querySelectorAll(sel))
+        let links = elements.map(element => {
+          return {
+            description: element.querySelector(
+              'div > div.experience-title-location > h3'
+            ).textContent,
+            duration: element.querySelector(
+              'div > div.experience-title-location > span.experience-period'
+            ).textContent
+          }
+        })
+        return links
+      }, sel)
+      return { parcours }
+    } catch (e) {
+      return { parcours: 'Null' }
+    }
   }
 
   async getCompetences(page) {
-    const sel =
-      '#public-profile > div > div > div.optional-components.fluid-container > div.gr.mbm > div.current-position-left.gu.gu-2of3.gu-s-1of1 > div.skills.pts > div > div > ul > li'
-    const competences = await page.evaluate(sel => {
-      let elements = Array.from(document.querySelectorAll(sel))
-      let links = elements.map(element => {
-        return element.textContent
-      })
-      return links
-    }, sel)
-    return { competences }
+    try {
+      const sel =
+        '#public-profile > div > div > div.optional-components.fluid-container > div.gr.mbm > div.current-position-left.gu.gu-2of3.gu-s-1of1 > div.skills.pts > div > div > ul > li'
+      const competences = await page.evaluate(sel => {
+        let elements = Array.from(document.querySelectorAll(sel))
+        let links = elements.map(element => {
+          return element.textContent
+        })
+        return links
+      }, sel)
+      return { competences }
+    } catch (e) {
+      return { competences: 'Null' }
+    }
   }
 
   async getLangues(page) {
-    const sel =
-      '#public-profile > div > div > div.optional-components.fluid-container > div.gr.mbm > div.current-position-left.gu.gu-2of3.gu-s-1of1 > div.languages.pts > div > div > ul > li'
-    const langues = await page.evaluate(sel => {
-      let elements = Array.from(document.querySelectorAll(sel))
-      let links = elements.map(element => {
-        if (!element.querySelector('div > a > span')) return 'Null'
-        const level = element.querySelector('div > a > span').textContent
-        return {
-          name: element.textContent.replace(level, ''),
-          level: level
-        }
-      })
-      return links
-    }, sel)
-    return { langues }
+    try {
+      const sel =
+        '#public-profile > div > div > div.optional-components.fluid-container > div.gr.mbm > div.current-position-left.gu.gu-2of3.gu-s-1of1 > div.languages.pts > div > div > ul > li'
+      const langues = await page.evaluate(sel => {
+        let elements = Array.from(document.querySelectorAll(sel))
+        let links = elements.map(element => {
+          if (!element.querySelector('div > a > span')) return 'Null'
+          const level = element.querySelector('div > a > span').textContent
+          return {
+            name: element.textContent.replace(level, ''),
+            level: level
+          }
+        })
+        return links
+      }, sel)
+      return { langues }
+    } catch (e) {
+      return { langues: 'Null' }
+    }
   }
 
   async getInteret(page) {
-    const sel =
-      '#public-profile > div > div > div.optional-components.fluid-container > div.gr.mbm > div.current-position-left.gu.gu-2of3.gu-s-1of1 > div.hobbies.pts > div > div > div.gu.gu-last.pls.ptl.prm.pbl > ul > li > span'
-    const interet = await page.evaluate(sel => {
-      let elements = Array.from(document.querySelectorAll(sel))
-      let links = elements.map(element => {
-        return element.textContent
-      })
-      return links
-    }, sel)
-    return { interet }
+    try {
+      const sel =
+        '#public-profile > div > div > div.optional-components.fluid-container > div.gr.mbm > div.current-position-left.gu.gu-2of3.gu-s-1of1 > div.hobbies.pts > div > div > div.gu.gu-last.pls.ptl.prm.pbl > ul > li > span'
+      const interet = await page.evaluate(sel => {
+        let elements = Array.from(document.querySelectorAll(sel))
+        let links = elements.map(element => {
+          return element.textContent
+        })
+        return links
+      }, sel)
+      return { interet }
+    } catch (e) {
+      return { interet: 'Null' }
+    }
   }
 
   async getNbContacts(page) {
-    const nbContacts = await page.evaluate(
-      () =>
-        document.querySelector(
+    const nbContacts = await page.evaluate(() => {
+      if (
+        !document.querySelector(
           '#public-profile > div > div > div.optional-components.fluid-container > div.gr.mbm > div.current-position-left.gu.gu-2of3.gu-s-1of1 > div.current-position.bx.bx-default.ptn.pln.prn.pbn.mbs.gr > div.gr.current-position__footer > div.gu.gu-2of3.gu-m-1of2 > div > p.blue3.mbn.current-position__footer-contacts'
-        ).textContent
-    )
+        )
+      )
+        return 'Null'
+      return document.querySelector(
+        '#public-profile > div > div > div.optional-components.fluid-container > div.gr.mbm > div.current-position-left.gu.gu-2of3.gu-s-1of1 > div.current-position.bx.bx-default.ptn.pln.prn.pbn.mbs.gr > div.gr.current-position__footer > div.gu.gu-2of3.gu-m-1of2 > div > p.blue3.mbn.current-position__footer-contacts'
+      ).textContent
+    })
     return nbContacts
   }
 
   async getRelations(page) {
-    const sel =
-      '#public-profile > div > div > div.optional-components.fluid-container > div.gr.mbm > div.gu.gu-last > div.suggested-profiles.bx.bx-default.ptm.pll.prl.pbl.mbs.mls.mln-s > ul > li'
-    const relations = await page.evaluate(sel => {
-      let elements = Array.from(document.querySelectorAll(sel))
-      let links = elements.map(element => {
-        return {
-          link: element.querySelector('a').href,
-          name: element.querySelector('a > div').textContent
-        }
-      })
-      return links
-    }, sel)
-    return { relations }
+    try {
+      const sel =
+        '#public-profile > div > div > div.optional-components.fluid-container > div.gr.mbm > div.gu.gu-last > div.suggested-profiles.bx.bx-default.ptm.pll.prl.pbl.mbs.mls.mln-s > ul > li'
+      const relations = await page.evaluate(sel => {
+        let elements = Array.from(document.querySelectorAll(sel))
+        let links = elements.map(element => {
+          return {
+            link: element.querySelector('a').href,
+            name: element.querySelector('a > div').textContent
+          }
+        })
+        return links
+      }, sel)
+      return { relations }
+    } catch (e) {
+      return { relations: 'Null' }
+    }
   }
 
   async writeToFile(json) {

@@ -1,65 +1,74 @@
-const puppeteer = require("puppeteer");
-const ProfileScrapper = require("./profileScrapper");
+const puppeteer = require('puppeteer')
+const ProfileScrapper = require('./profileScrapper')
 async function timeout(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise(resolve => setTimeout(resolve, ms))
 }
-linkArray = [];
-(async () => {
-  const browser = await puppeteer.launch({ headless: false, devtools: true });
-  const page = await browser.newPage();
+linkArray = []
+;(async () => {
+  const browser = await puppeteer.launch({ headless: true })
+  const page = await browser.newPage()
   await page.setViewport({
     width: 1200,
     height: 800
-  });
-  await scrapper(page);
-  await browser.close();
-})();
+  })
+  await scrapper(page, browser)
+})()
 
 accessSearchPage = async page => {
   //TODO
-  name = "Arnaud";
+  name = 'Arnaud'
 
-  await page.goto(`https://www.qwant.com/?q=viadeo.com%20%2b${name}&t=web`);
-  await page.waitForSelector("div.result__url > span");
-  await autoScroll(page);
-  const sel = "div.result__url > span";
+  await page.goto(`https://www.qwant.com/?q=viadeo.com%20%2b${name}&t=web`)
+  await page.waitForSelector('div.result__url > span')
+  await autoScroll(page)
+  const sel = 'div.result__url > span'
   const langues = await page.evaluate(sel => {
-    let elements = Array.from(document.querySelectorAll(sel));
+    let elements = Array.from(document.querySelectorAll(sel))
 
     let links = elements.map(element => {
-      return element.textContent.includes("profile") ? element.textContent : 0;
-    });
-    return links;
-  }, sel);
-  return langues;
-};
+      return element.textContent.includes('profile') ? element.textContent : 0
+    })
+    return links
+  }, sel)
+  return langues
+}
 
-scrapper = async page => {
-  s = await accessSearchPage(page);
-  for (const link of s) {
-    url = "https://" + link;
-    if (link !== 0) {
-      const profil = new ProfileScrapper(url, page);
-      await profil.getProfile();
-    }
+async function asyncForEach(array, callback) {
+  for (let index = 0; index < array.length; index++) {
+    await callback(array[index], index, array)
   }
-};
+}
+
+const scrapper = async (page, browser) => {
+  let count = 0
+  tableURL = await accessSearchPage(page)
+  await asyncForEach(tableURL, async element => {
+    if (element === 0) return 1
+    const page = await browser.newPage()
+    const profilScrapper = new ProfileScrapper(`http://${element}`, page)
+    await profilScrapper.getProfile()
+    count++
+    console.log(`${count} profiles récuppérés`)
+  })
+  console.log('Done')
+  await browser.close()
+}
 
 async function autoScroll(page) {
   await page.evaluate(async () => {
     await new Promise((resolve, reject) => {
-      var totalHeight = 0;
-      var distance = 100;
+      var totalHeight = 0
+      var distance = 100
       var timer = setInterval(() => {
-        var scrollHeight = document.body.scrollHeight;
-        window.scrollBy(0, distance);
-        totalHeight += distance;
+        var scrollHeight = document.body.scrollHeight
+        window.scrollBy(0, distance)
+        totalHeight += distance
 
         if (totalHeight >= scrollHeight) {
-          clearInterval(timer);
-          resolve();
+          clearInterval(timer)
+          resolve()
         }
-      }, 100);
-    });
-  });
+      }, 100)
+    })
+  })
 }
