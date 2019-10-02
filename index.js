@@ -1,9 +1,9 @@
 const puppeteer = require('puppeteer')
 const ProfileScrapper = require('./profileScrapper')
+const DataInsert = require('./dataInsert')
 const firstnames = require('./prenoms.json')
-async function timeout(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms))
-}
+const mongoDB = new DataInsert('mongodb://localhost:27017/url')
+
 linkArray = []
 ;(async () => {
   const browser = await puppeteer.launch({ headless: true })
@@ -16,19 +16,19 @@ linkArray = []
 })()
 
 accessSearchPage = async page => {
-  //TODO
   name = ''
   tabURL = []
   for (firstname of firstnames.prenoms) {
     name = firstname
     console.log(name)
+
     await page.goto(`https://www.qwant.com/?q=viadeo.com%20%2b${name}&t=web`)
     await page.waitForSelector('div.result__url > span')
     await autoScroll(page)
+
     const sel = 'div.result__url > span'
     const urls = await page.evaluate(sel => {
       let elements = Array.from(document.querySelectorAll(sel))
-
       let links = elements
         .filter(element => {
           if (element.textContent.includes('profile')) {
@@ -39,9 +39,13 @@ accessSearchPage = async page => {
         .map(element => element.textContent)
       return links
     }, sel)
-    // INSERT MONGO
+
+    //insert in Mongo
+    mongoDB.getURLToCrawl()
+    urls.forEach(element => {
+      mongoDB.insertURL(element)
+    })
     tabURL.concat(urls)
-    console.log(urls)
     console.log(tabURL.length)
   }
   return tabURL

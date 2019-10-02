@@ -19,13 +19,19 @@ module.exports = class DataInsert {
     var urlToInsert = new CollectionURL()
 
     urlToInsert.url = url
-    urlToInsert.status = 'OK'
+    urlToInsert.status = 'NOT OK'
 
-    urlToInsert.save(function(err) {
-      if (err) {
-        console.log(err)
+    CollectionURL.find({ url: url }, function(err, docs) {
+      if (docs.length) {
+        console.log('URL already inserted')
+      } else {
+        urlToInsert.save(function(err) {
+          if (err) {
+            console.log(err)
+          }
+          console.log('URL inserted')
+        })
       }
-      console.log('URL inserted')
     })
   }
 
@@ -34,6 +40,7 @@ module.exports = class DataInsert {
       if (err) {
         console.log('Not inserted')
       }
+      console.log(urls)
       return urls
     })
   }
