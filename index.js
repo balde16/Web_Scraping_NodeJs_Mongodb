@@ -3,6 +3,7 @@ const ProfileScrapper = require('./profileScrapper')
 const DataInsert = require('./dataInsert')
 const firstnames = require('./prenoms.json')
 const mongoDB = new DataInsert('mongodb://localhost:27017/url')
+const fs = require('fs')
 
 linkArray = []
 ;(async () => {
@@ -18,10 +19,10 @@ linkArray = []
 accessSearchPage = async page => {
   name = ''
   tabURL = []
-  for (firstname of firstnames.prenoms) {
-    name = firstname
-    console.log(name)
-
+  let i = 0
+  for ({ name, done } of firstnames.prenoms) {
+    console.log({ name, done })
+    if (done) continue
     await page.goto(`https://www.qwant.com/?q=viadeo.com%20%2b${name}&t=web`)
     await page.waitForSelector('div.result__url > span')
     await autoScroll(page)
@@ -46,9 +47,17 @@ accessSearchPage = async page => {
       mongoDB.insertURL(element)
     })
     tabURL.concat(urls)
-    console.log(tabURL.length)
+    firstnames.prenoms[i].done = true
+    await checkName(firstnames)
+    i++
   }
   return tabURL
+}
+
+async function checkName(json) {
+  fs.writeFile('prenoms.json', JSON.stringify(json), function(err) {
+    if (err) throw err
+  })
 }
 
 async function asyncForEach(array, callback) {

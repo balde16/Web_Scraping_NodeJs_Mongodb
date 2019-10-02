@@ -22,6 +22,7 @@ module.exports = class DataInsert {
     urlToInsert.status = 'NOT OK'
 
     CollectionURL.find({ url: url }, function(err, docs) {
+      console.log(url)
       if (docs.length) {
         console.log('URL already inserted')
       } else {
@@ -29,7 +30,7 @@ module.exports = class DataInsert {
           if (err) {
             console.log(err)
           }
-          console.log('URL inserted')
+          // console.log('URL inserted')
         })
       }
     })
