@@ -1,47 +1,47 @@
 const fs = require('fs')
 
-// const puppeteer = require('puppeteer')
-// ;(async () => {
-//   const browser = await puppeteer.launch({ headless: true })
-//   const tableURL = [
-//     'http://fr.viadeo.com/fr/profile/carole.colombier',
-//     'http://fr.viadeo.com/fr/profile/k%C3%A9vin.prouha',
-//     'http://fr.viadeo.com/fr/profile/quentin.traverso',
-//     'http://fr.viadeo.com/fr/profile/fran%C3%A7ois-laurent.contenay',
-//     'http://fr.viadeo.com/fr/profile/beno%C3%AEt.thoprieux1',
-//     'http://fr.viadeo.com/fr/profile/kahina.kharbaoui',
-//     'http://ma.viadeo.com/fr/profile/rabi.kharbaoui',
-//     'http://ma.viadeo.com/fr/profile/hamani.fahd',
-//     'http://dz.viadeo.com/fr/profile/rezki.hamichi',
-//     'http://dz.viadeo.com/fr/profile/amine.bouchachia',
-//     'http://fr.viadeo.com/fr/profile/ryma.rebaine',
-//     'http://fr.viadeo.com/fr/profile/mika%C3%ABl.cadour',
-//     'http://fr.viadeo.com/fr/profile/guillaume.morazin',
-//     'http://fr.viadeo.com/fr/profile/antoine.le-gall8',
-//     'http://fr.viadeo.com/fr/profile/jordan.le-vexier',
-//     'http://fr.viadeo.com/fr/profile/cl%C3%A9ment.mutz',
-//     'http://fr.viadeo.com/fr/profile/arnaud.lavanant',
-//     'http://ie.viadeo.com/fr/profile/thomas.goarant'
-//   ]
+const puppeteer = require('puppeteer')
+;(async () => {
+  const browser = await puppeteer.launch({ headless: true })
+  const tableURL = [
+    'http://fr.viadeo.com/fr/profile/carole.colombier',
+    'http://fr.viadeo.com/fr/profile/k%C3%A9vin.prouha',
+    'http://fr.viadeo.com/fr/profile/quentin.traverso',
+    'http://fr.viadeo.com/fr/profile/fran%C3%A7ois-laurent.contenay',
+    'http://fr.viadeo.com/fr/profile/beno%C3%AEt.thoprieux1',
+    'http://fr.viadeo.com/fr/profile/kahina.kharbaoui',
+    'http://ma.viadeo.com/fr/profile/rabi.kharbaoui',
+    'http://ma.viadeo.com/fr/profile/hamani.fahd',
+    'http://dz.viadeo.com/fr/profile/rezki.hamichi',
+    'http://dz.viadeo.com/fr/profile/amine.bouchachia',
+    'http://fr.viadeo.com/fr/profile/ryma.rebaine',
+    'http://fr.viadeo.com/fr/profile/mika%C3%ABl.cadour',
+    'http://fr.viadeo.com/fr/profile/guillaume.morazin',
+    'http://fr.viadeo.com/fr/profile/antoine.le-gall8',
+    'http://fr.viadeo.com/fr/profile/jordan.le-vexier',
+    'http://fr.viadeo.com/fr/profile/cl%C3%A9ment.mutz',
+    'http://fr.viadeo.com/fr/profile/arnaud.lavanant',
+    'http://ie.viadeo.com/fr/profile/thomas.goarant'
+  ]
 
-//   async function asyncForEach(array, callback) {
-//     for (let index = 0; index < array.length; index++) {
-//       await callback(array[index], index, array)
-//     }
-//   }
+  async function asyncForEach(array, callback) {
+    for (let index = 0; index < array.length; index++) {
+      await callback(array[index], index, array)
+    }
+  }
 
-//   const startCrawl = async () => {
-//     await asyncForEach(tableURL, async element => {
-//       const page = await browser.newPage()
-//       const scrapper = new ProfileScrapper(element, page)
-//       await scrapper.getProfile()
-//     })
-//     console.log('Done')
-//     await browser.close()
-//   }
+  const startCrawl = async () => {
+    await asyncForEach(tableURL, async element => {
+      const page = await browser.newPage()
+      const scrapper = new ProfileScrapper(element, page)
+      await scrapper.getProfile()
+    })
+    console.log('Done')
+    await browser.close()
+  }
 
-//   startCrawl()
-// })()
+  startCrawl()
+})()
 
 class ProfileScrapper {
   constructor(url, page) {
@@ -53,7 +53,7 @@ class ProfileScrapper {
     const textContent = await page.evaluate(
       () =>
         document.querySelector(
-          '#ember653 > div.profile-main-container > section > div > div.profile-overview.gu.gu-m-1of1 > h1'
+          '#public-profile > div > div > div.bx.tac-m.ptn.header.mbs > div.gr.grsxs.fluid-container > div.gu.gu-last.ptxl.ptn-m > div > h1'
         ).textContent
     )
     var fullName = textContent.split(' '),
@@ -180,19 +180,14 @@ class ProfileScrapper {
 
   async getProfile() {
     async function timeout(ms) {
-      return new Promise(resolve => setTimeout(resolve, ms));
+      return new Promise(resolve => setTimeout(resolve, ms))
     }
     const { page, url } = this
     const resJson = {}
     await page.goto(url)
-<<<<<<< HEAD
     await page.waitForSelector(
       '#public-profile > div > div > div.bx.tac-m.ptn.header.mbs > div.gr.grsxs.fluid-container > div.gu.gu-1of5.gu-m-1of1.header-content > div > img'
     )
-=======
-    await timeout(5000);
-
->>>>>>> f18070d3753ff422eb3534bc7c338aa54c35f9aa
     // Nom: '',
     // Prenom: '',
     const name = await this.getName(page)
