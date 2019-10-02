@@ -28,4 +28,25 @@ module.exports = class DataInsert {
       console.log('URL inserted')
     })
   }
+
+  getURLToCrawl() {
+    CollectionURL.find({ type: 'NOT OK' }, (err, urls) => {
+      if (err) {
+        console.log('Not inserted')
+      }
+      return urls
+    })
+  }
+
+  async validateURL(url) {
+    url.status('OK')
+    await url.save()
+    console.log('URL validated')
+  }
+
+  async invalidateURL(url) {
+    url.status('NOT OK')
+    await url.save()
+    console.log('URL invalisated')
+  }
 }
