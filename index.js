@@ -1,6 +1,6 @@
-const puppeteer = require("puppeteer")
-const ProfileScrapper = require("./profileScrapper")
-const firstnames = require("./prenoms.json")
+const puppeteer = require('puppeteer')
+const ProfileScrapper = require('./profileScrapper')
+const firstnames = require('./prenoms.json')
 async function timeout(ms) {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
@@ -17,24 +17,26 @@ linkArray = []
 
 accessSearchPage = async page => {
   //TODO
-  name = ""
+  name = ''
   tabURL = []
   for (firstname of firstnames.prenoms) {
     name = firstname
     console.log(name)
     await page.goto(`https://www.qwant.com/?q=viadeo.com%20%2b${name}&t=web`)
-    await page.waitForSelector("div.result__url > span")
+    await page.waitForSelector('div.result__url > span')
     await autoScroll(page)
-    const sel = "div.result__url > span"
+    const sel = 'div.result__url > span'
     const urls = await page.evaluate(sel => {
       let elements = Array.from(document.querySelectorAll(sel))
 
-      let links = elements.filter(element => {
-        if(element.textContent.includes("profile")) {
-         return true  
-        }
-        return
-      }).map(element => element.textContent)
+      let links = elements
+        .filter(element => {
+          if (element.textContent.includes('profile')) {
+            return true
+          }
+          return
+        })
+        .map(element => element.textContent)
       return links
     }, sel)
     // INSERT MONGO
@@ -62,7 +64,7 @@ const scrapper = async (page, browser) => {
     count++
     console.log(`${count} profiles récuppérés`)
   })
-  console.log("Done")
+  console.log('Done')
   await browser.close()
 }
 
