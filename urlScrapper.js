@@ -26,26 +26,34 @@ accessSearchPage = async page => {
     )
     const { name } = value
     await page.goto(`https://www.qwant.com/?q=viadeo.com%20%2b${name}&t=web`)
-    await page.waitForSelector('div.result__url > span')
-    await autoScroll(page)
-    const sel = 'div.result__url > span'
-    const urls = await page.evaluate(sel => {
-      let elements = Array.from(document.querySelectorAll(sel))
-      let links = elements
-        .filter(element => {
-          if (element.textContent.includes('profile')) {
-            return true
-          }
-          return
-        })
-        .map(element => element.textContent)
-      return links
-    }, sel)
+    try {
+      await page.waitFor("div.result__url > span", { timeout: 1000 })
+      await autoScroll(page)
+      const sel = "div.result__url > span"
+      const urls = await page.evaluate(sel => {
+        let elements = Array.from(document.querySelectorAll(sel))
+        let links = elements
+          .filter(element => {
+            if (element.textContent.includes("profile")) {
+              return true
+            }
+            return
+          })
+          .map(element => element.textContent)
+        return links
+      }, sel)
 
-    urls.forEach(element => {
-      mongoDB.insertURL(element)
-    })
-    count = await collection.countDocuments({ done: false })
+      urls.forEach(element => {
+        mongoDB.insertURL(element)
+      })
+      count = await collection.countDocuments({ done: false })
+    } catch (e) {
+      console.error(e)
+      const { value } = await collection.findOneAndUpdate(
+        { done: false },
+        { $set: { done: true } }
+      )
+    }
   }
   return 1
 }
