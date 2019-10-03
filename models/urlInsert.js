@@ -10,6 +10,7 @@ const CollectionURL = mongoose.model('URL', urlSchema)
 module.exports = class UrlInsert {
   constructor(url) {
     this.url = url
+    this.collection = new CollectionURL()
     mongoose.connect(url, { useNewUrlParser: true })
     const db = mongoose.connection
     db.on('error', console.error.bind(console, 'connection error:'))

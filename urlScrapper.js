@@ -1,12 +1,10 @@
 const puppeteer = require('puppeteer')
-const ProfileScrapper = require('./profileScrapper')
 const UrlInsert = require('./models/urlInsert')
 const NameInsert = require('./models/nameInsert')
-const mongoDB = new UrlInsert('mongodb://localhost:27017/url')
-const mongoDBname = new NameInsert('mongodb://localhost:27017/url')
-const fs = require('fs')
+const conf = require('./conf.json')
+const mongoDB = new UrlInsert(conf.url)
+const mongoDBname = new NameInsert(conf.url)
 
-linkArray = []
 ;(async () => {
   const browser = await puppeteer.launch({ headless: true })
   const page = await browser.newPage()
@@ -52,24 +50,9 @@ accessSearchPage = async page => {
   return 1
 }
 
-async function asyncForEach(array, callback) {
-  for (let index = 0; index < array.length; index++) {
-    await callback(array[index], index, array)
-  }
-}
-
 const scrapper = async (page, browser) => {
-  let count = 0
   await mongoDBname.insertAllName()
   await accessSearchPage(page)
-  // await asyncForEach(tableURL, async element => {
-  //   if (element === 0) return 1
-  //   const page = await browser.newPage()
-  //   // const profilScrapper = new ProfileScrapper(`http://${element}`, page)
-  //   // await profilScrapper.getProfile()
-  //   count++
-  //   console.log(`${count} profiles récuppérés`)
-  // })
   console.log('Done')
   await browser.close()
   return 1

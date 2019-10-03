@@ -222,8 +222,8 @@ module.exports = class ProfileScrapper {
     const { relations } = await this.getRelations(page)
     if (relations.length !== 0) resJson.Relation = relations
 
-    console.log(resJson)
-    this.writeToFile(resJson)
+    //     console.log(resJson)
+    // this.writeToFile(resJson)
     return resJson
   }
 }
