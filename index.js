@@ -1,8 +1,9 @@
 const puppeteer = require('puppeteer')
 const ProfileScrapper = require('./profileScrapper')
-const DataInsert = require('./dataInsert')
-const firstnames = require('./prenoms.json')
-const mongoDB = new DataInsert('mongodb://localhost:27017/url')
+const UrlInsert = require('./models/urlInsert')
+const NameInsert = require('./models/nameInsert')
+const mongoDB = new UrlInsert('mongodb://localhost:27017/url')
+const mongoDBname = new NameInsert('mongodb://localhost:27017/url')
 const fs = require('fs')
 
 linkArray = []
@@ -14,19 +15,21 @@ linkArray = []
     height: 800
   })
   await scrapper(page, browser)
+  return 1
 })()
 
 accessSearchPage = async page => {
-  name = ''
-  tabURL = []
-  let i = 0
-  for ({ name, done } of firstnames.prenoms) {
-    console.log({ name, done })
-    if (done) continue
+  const { collection } = mongoDBname.collection
+  let count = await collection.countDocuments({ done: false })
+  while (count > 0) {
+    const { value } = await collection.findOneAndUpdate(
+      { done: false },
+      { $set: { done: true } }
+    )
+    const { name } = value
     await page.goto(`https://www.qwant.com/?q=viadeo.com%20%2b${name}&t=web`)
     await page.waitForSelector('div.result__url > span')
     await autoScroll(page)
-
     const sel = 'div.result__url > span'
     const urls = await page.evaluate(sel => {
       let elements = Array.from(document.querySelectorAll(sel))
@@ -41,23 +44,12 @@ accessSearchPage = async page => {
       return links
     }, sel)
 
-    //insert in Mongo
-    mongoDB.getURLToCrawl()
     urls.forEach(element => {
       mongoDB.insertURL(element)
     })
-    tabURL.concat(urls)
-    firstnames.prenoms[i].done = true
-    await checkName(firstnames)
-    i++
+    count = await collection.countDocuments({ done: false })
   }
-  return tabURL
-}
-
-async function checkName(json) {
-  fs.writeFile('prenoms.json', JSON.stringify(json), function(err) {
-    if (err) throw err
-  })
+  return 1
 }
 
 async function asyncForEach(array, callback) {
@@ -68,17 +60,19 @@ async function asyncForEach(array, callback) {
 
 const scrapper = async (page, browser) => {
   let count = 0
-  tableURL = await accessSearchPage(page)
-  await asyncForEach(tableURL, async element => {
-    if (element === 0) return 1
-    const page = await browser.newPage()
-    const profilScrapper = new ProfileScrapper(`http://${element}`, page)
-    // await profilScrapper.getProfile()
-    count++
-    console.log(`${count} profiles récuppérés`)
-  })
+  await mongoDBname.insertAllName()
+  await accessSearchPage(page)
+  // await asyncForEach(tableURL, async element => {
+  //   if (element === 0) return 1
+  //   const page = await browser.newPage()
+  //   // const profilScrapper = new ProfileScrapper(`http://${element}`, page)
+  //   // await profilScrapper.getProfile()
+  //   count++
+  //   console.log(`${count} profiles récuppérés`)
+  // })
   console.log('Done')
   await browser.close()
+  return 1
 }
 
 async function autoScroll(page) {

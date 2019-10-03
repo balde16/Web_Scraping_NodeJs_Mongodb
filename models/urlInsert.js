@@ -2,12 +2,12 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
 const urlSchema = new Schema({
-  url: String,
+  url: { type: String, unique: true },
   status: String // OK / NOT OK
 })
 const CollectionURL = mongoose.model('URL', urlSchema)
 
-module.exports = class DataInsert {
+module.exports = class UrlInsert {
   constructor(url) {
     this.url = url
     mongoose.connect(url, { useNewUrlParser: true })
@@ -20,23 +20,15 @@ module.exports = class DataInsert {
 
     urlToInsert.url = url
     urlToInsert.status = 'NOT OK'
-
-    CollectionURL.find({ url: url }, function(err, docs) {
-      console.log(url)
-      if (docs.length) {
-        console.log('URL already inserted')
-      } else {
-        urlToInsert.save(function(err) {
-          if (err) {
-            console.log(err)
-          }
-          // console.log('URL inserted')
-        })
+    urlToInsert.save(function(err) {
+      if (err) {
+        console.log(err)
       }
+      console.log(`URL inserted : ${url}`)
     })
   }
 
-  getURLToCrawl() {
+  isURLDone() {
     CollectionURL.find({ type: 'NOT OK' }, (err, urls) => {
       if (err) {
         console.log('Not inserted')
