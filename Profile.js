@@ -173,57 +173,61 @@ module.exports = class ProfileScrapper {
   }
 
   async getProfile() {
-    async function timeout(ms) {
-      return new Promise(resolve => setTimeout(resolve, ms))
+    try {
+      async function timeout(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms))
+      }
+      const { page, url } = this
+      const resJson = {}
+      await page.goto(url)
+      await page.waitForSelector(
+        '#public-profile > div > div > div.bx.tac-m.ptn.header.mbs > div.gr.grsxs.fluid-container > div.gu.gu-1of5.gu-m-1of1.header-content > div > img'
+      )
+      // Nom: '',
+      // Prenom: '',
+      const name = await this.getName(page)
+      resJson.Nom = name.firstName
+      resJson.Prenom = name.lastName
+
+      // Photo: '',
+      const { photo } = await this.getPhoto(page)
+      resJson.Photo = photo
+
+      // LienProfil: '',
+      resJson.LienProfil = page.url()
+
+      // Description: '',
+      const { desc } = await this.getDesc(page)
+      if (desc.length !== 0) resJson.Description = desc
+
+      // ParcoursPro: '',
+      const { parcours } = await this.getParcours(page)
+      if (parcours.length !== 0) resJson.ParcoursPro = parcours
+
+      // Competences: '',
+      const { competences } = await this.getCompetences(page)
+      if (competences.length !== 0) resJson.Competences = competences
+
+      // Langues: '',
+      const { langues } = await this.getLangues(page)
+      if (langues.length !== 0) resJson.Langues = langues
+
+      // Interet: '',
+      const { interet } = await this.getInteret(page)
+      if (interet.length !== 0) resJson.Interet = interet
+
+      // NbContacts: ''
+      resJson.NbContacts = await this.getNbContacts(page)
+
+      // Relation: ''
+      const { relations } = await this.getRelations(page)
+      if (relations.length !== 0) resJson.Relation = relations
+
+      //     console.log(resJson)
+      // this.writeToFile(resJson)
+      return resJson
+    } catch (e) {
+      return 0
     }
-    const { page, url } = this
-    const resJson = {}
-    await page.goto(url)
-    await page.waitForSelector(
-      '#public-profile > div > div > div.bx.tac-m.ptn.header.mbs > div.gr.grsxs.fluid-container > div.gu.gu-1of5.gu-m-1of1.header-content > div > img'
-    )
-    // Nom: '',
-    // Prenom: '',
-    const name = await this.getName(page)
-    resJson.Nom = name.firstName
-    resJson.Prenom = name.lastName
-
-    // Photo: '',
-    const { photo } = await this.getPhoto(page)
-    resJson.Photo = photo
-
-    // LienProfil: '',
-    resJson.LienProfil = page.url()
-
-    // Description: '',
-    const { desc } = await this.getDesc(page)
-    if (desc.length !== 0) resJson.Description = desc
-
-    // ParcoursPro: '',
-    const { parcours } = await this.getParcours(page)
-    if (parcours.length !== 0) resJson.ParcoursPro = parcours
-
-    // Competences: '',
-    const { competences } = await this.getCompetences(page)
-    if (competences.length !== 0) resJson.Competences = competences
-
-    // Langues: '',
-    const { langues } = await this.getLangues(page)
-    if (langues.length !== 0) resJson.Langues = langues
-
-    // Interet: '',
-    const { interet } = await this.getInteret(page)
-    if (interet.length !== 0) resJson.Interet = interet
-
-    // NbContacts: ''
-    resJson.NbContacts = await this.getNbContacts(page)
-
-    // Relation: ''
-    const { relations } = await this.getRelations(page)
-    if (relations.length !== 0) resJson.Relation = relations
-
-    //     console.log(resJson)
-    // this.writeToFile(resJson)
-    return resJson
   }
 }

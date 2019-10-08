@@ -32,7 +32,7 @@ accessProfilePage = async browser => {
     count++
     console.log(`${count} profiles récuppérés`)
 
-    mongoDBProfile.insertUser(profile)
+    if (profile !== 0) mongoDBProfile.insertUser(profile)
 
     count = await collection.countDocuments({ status: 'NOT OK' })
   }
