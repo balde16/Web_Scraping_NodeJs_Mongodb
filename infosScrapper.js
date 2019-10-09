@@ -29,10 +29,18 @@ accessProfilePage = async browser => {
     const page = await browser.newPage()
     const profilScrapper = new ProfileScrapper(`http://${url}`, page)
     const profile = await profilScrapper.getProfile()
-    count++
-    console.log(`${count} profiles récuppérés`)
 
-    if (profile !== 0) mongoDBProfile.insertUser(profile)
+    if (profile !== 0) {
+      count--
+      console.log(`${count} encore à récuppérer`)
+      mongoDBProfile.insertUser(profile)
+    } else {
+      await collection.findOneAndUpdate(
+        { url: value },
+        { $set: { status: 'NOT OK' } }
+      )
+      console.log("ERREUR")
+    }
 
     count = await collection.countDocuments({ status: 'NOT OK' })
   }

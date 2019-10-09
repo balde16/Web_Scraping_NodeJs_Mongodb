@@ -227,6 +227,7 @@ module.exports = class ProfileScrapper {
       // this.writeToFile(resJson)
       return resJson
     } catch (e) {
+      console.log(e)
       return 0
     }
   }
