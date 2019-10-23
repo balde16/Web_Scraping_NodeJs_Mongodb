@@ -48,31 +48,33 @@ const urlSchema = new Schema({
 const CollectionURL = mongoose.model("URL", urlSchema)
 
 readRelations = async () => {
-  await CollectionProfile.find({})
-    .skip(22000)
-    .limit(23000)
+  CollectionProfile.find({})
+    .skip(105000)
+    .limit(5560)
     .select({ Relation: 1 })
     .exec(async (err, profiles) => {
       try {
-        for (const profile of profiles) {
-          for (let i = 0; i < profile.Relation.length; i++) {
-            const url = profile.Relation[i].link
-            await pushName(url)
-              .then(() => console.log("Push NAme is DOne ------------"))
-              .catch(error => console.log(error))
+        const push = async profiles => {
+          for (const profile of profiles) {
+            for (let i = 0; i < profile.Relation.length; i++) {
+              const url = profile.Relation[i].link
+              pushName(url)
+                .then(() => console.log("Push NAme is DOne ------------"))
+                .catch(error => console.log(error))
+            }
           }
         }
+        await push(profiles)
       } catch (err) {
         console.log(err)
       }
     })
 }
-
-pushName = async url => {
+ pushName = async url => {
   let urlToInsert = new CollectionURL()
   urlToInsert.url = url
   urlToInsert.status = "NOT OK"
-  await urlToInsert.save(function(err) {
+  await urlToInsert.save(err => {
     if (err) {
       console.log(err)
     }
@@ -80,6 +82,11 @@ pushName = async url => {
   })
 }
 
-readRelations()
-  .then(() => console.log("done"))
+callFunction = async () => {
+  await readRelations()
+    .then(() => console.log("readRelations -------"))
+    .catch(error => console.log(error))
+}
+callFunction()
+  .then(() => console.log("Done Call"))
   .catch(error => console.log(error))
