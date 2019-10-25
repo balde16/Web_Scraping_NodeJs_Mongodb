@@ -40,6 +40,42 @@ module.exports = class UrlInsert {
     db.on('error', console.error.bind(console, 'connection error:'))
   }
 
+  async getLangues() {
+    const res = {}
+    const listLangues = await CollectionProfile.distinct('Langues.name')
+    for (let index = 0; index < listLangues.length; index++) {
+      res[listLangues[index]] = await CollectionProfile.countDocuments({
+        'Langues.name': listLangues[index]
+      })
+    }
+    return res
+  }
+
+  async getParcoursPro() {
+    const res = {}
+    const listParcours = await CollectionProfile.distinct(
+      'ParcoursPro.description'
+    )
+    return listParcours.filter(parcours => {
+      if (
+        parcours &&
+        parcours !== null &&
+        parcours !== '' &&
+        parcours !== undefined
+      ) {
+        return parcours.trim()
+      }
+    })
+    return res
+  }
+
+  async getcompetences() {
+    const listCompetences = await CollectionProfile.distinct('Competences')
+    return listCompetences.filter(comp => {
+      if (comp !== null && comp !== '' && comp !== undefined) return comp.trim()
+    })
+  }
+
   insertUser(profile) {
     var profileToInsert = new CollectionProfile(profile)
     console.log(profile)
